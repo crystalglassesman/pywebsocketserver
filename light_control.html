@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Light Control (0/1)</title>
+    <style>
+        .container {
+            text-align: center;
+            margin: 50px auto;
+            padding: 20px;
+            max-width: 400px;
+        }
+        .light {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 20px auto;
+            background-color: #555;
+            transition: all 0.3s;
+        }
+        .light.on {
+            background-color: #ffdd00;
+            box-shadow: 0 0 20px #ffdd00;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .status {
+            margin-top: 15px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Light Control</h1>
+        <div id="light" class="light"></div>
+        <div class="controls">
+            <button onclick="turnOn()">ON (1)</button>
+            <button onclick="turnOff()">OFF (0)</button>
+        </div>
+        <div id="status" class="status">Current status: OFF (0)</div>
+    </div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:8765');
+        const lightElement = document.getElementById('light');
+        const statusElement = document.getElementById('status');
+
+        ws.onmessage = function(event) {
+            const state = event.data;
+            lightElement.classList.toggle('on', state === "1");
+            statusElement.textContent = `Current status: ${state === "1" ? 'ON (1)' : 'OFF (0)'}`;
+        };
+
+        function turnOn() {
+            ws.send('1');
+        }
+
+        function turnOff() {
+            ws.send('0');
+        }
+    </script>
+</body>
+</html>

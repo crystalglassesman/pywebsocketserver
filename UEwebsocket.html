@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+	<html>
+	<head></head>
+	<body>
+		<h3 id="status">Connection Closed</h3>
+		<input id="in"></input>
+		<button id="btn" onclick="sendMessage()">Register Preset</button>
+		<div id="holder"></div>
+		<script>
+			// WebSocket连接成功时，用于保存该连接的变量。
+			var connection = null;
+
+			/**
+			* 此函数发送WebSocket消息，以订阅远程控制预设发出的事件。
+			* 远程控制预设由用户在HTML输入字段中指定。
+			*/
+			function sendMessage() {
+				if (connection) {
+					let input = document.getElementById("in");
+					const registerPayload = {
+						"MessageName": "preset.register",
+						"Parameters": {
+							"PresetName": `${input.value}`
+						}
+					};
+					connection.send(JSON.stringify(registerPayload));
+				}
+			}
+
+			/**
+			* 每次加载页面时都会调用此函数。
+			* 该函数设置一个WebSocket连接，如果连接成功，则更新页面并显示"连接打开（Connection Open）"。
+			* 从WebSocket服务器接收到的任何消息，都将从JSON转换成HTML元素并显示在页面上。
+			* 该函数还会在控制台中记录完整的JSON消息响应。
+			*/
+			window.onload = function() {
+				console.log("Starting test")
+				connection = new WebSocket('ws://127.0.0.1:8765');
+				connection.onopen = function () {
+					document.getElementById("status").innerHTML = "Connection Open";
+				};
+				connection.onerror = function (error) {};
+				connection.onmessage = function (message) {
+					if (message.data instanceof Blob) {
+						reader = new FileReader();
+						reader.onload = () => {
+							let holder = document.getElementById("holder");
+							let par = document.createElement("pre");
+							par.style = style="white-space: pre-line";
+							let json = JSON.parse(reader.result);
+							let text = json.Type;
+							par.innerHTML = text;
+							holder.appendChild(par);
+							console.log(reader.result)
+						};
+						reader.readAsText(message.data);
+					} else {}
+				};
+				connection.onclose = function(event) {
+				console.log("WebSocket is closed now.");
+				};
+			}
+		</script>
+	</body>
+	</html>
