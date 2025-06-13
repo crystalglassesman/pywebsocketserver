@@ -15,3 +15,5 @@ uv sync
 go to the unzip folder
 cmd:
 uv run ./server2.py
+
+use client.html

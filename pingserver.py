@@ -28,7 +28,7 @@ async def handler(websocket):
 async def send_server_messages():
     """Send periodic messages from the server"""
     while True:
-        await asyncio.sleep(10)  # Send every 10 seconds
+        await asyncio.sleep(1)  # Send every 1 seconds
         if connected_clients:
             message = f"Server message: {datetime.now().strftime('%H:%M:%S')}"
             print(f"Sending: {message}")
